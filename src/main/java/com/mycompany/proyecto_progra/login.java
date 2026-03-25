@@ -4,6 +4,12 @@
  */
 package com.mycompany.proyecto_progra;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
  *
  * @author erick
@@ -119,6 +125,38 @@ public class login extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    // Método para conectar a la base de datos y obtener el saldo
+    private double ObtenerSaldoDB(String nombreUsuario) {
+        double saldoEncontrado = 0.0; // Saldo por defecto si hay un error o no existe
+        String url = "jdbc:sqlite:bancoVirtual.db"; // La ruta de tu base de datos
+        
+        // Esta es la consulta SQL. Los signos de interrogación son para inyectar datos de forma segura.
+        // NOTA: Asumo que tienes una tabla llamada "Usuarios" con columnas "usuario" y "saldo"
+        String sql = "SELECT saldo FROM Usuarios WHERE usuario = ?";
+        
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement pstmt  = conn.prepareStatement(sql)) {
+            
+            // Aquí reemplazamos el "?" con el nombre del usuario que intentó hacer login
+            pstmt.setString(1, nombreUsuario);
+            
+            // Ejecutamos la consulta y guardamos el resultado
+            ResultSet rs  = pstmt.executeQuery();
+            
+            // Si encontramos al usuario en la base de datos, extraemos su saldo
+            if (rs.next()) {
+                saldoEncontrado = rs.getDouble("saldo");
+            } else {
+                System.out.println("Usuario no encontrado en la base de datos.");
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("Error al consultar la base de datos: " + e.getMessage());
+        }
+        
+        return saldoEncontrado;
+    }
+    
     /**
      * @param args the command line arguments
      */
