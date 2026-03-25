@@ -106,7 +106,7 @@ public class login extends javax.swing.JFrame {
         // TODO add your handling code here:
         String user=jTextField1.getText(), password=jPasswordField1.getText();
         
-        double saldo = ObtenerSaldoDB(user);//aquí se debe crear un metodo para concectar con la db y así poder "solicitar" 
+        double saldo = ObtenerSaldoDB(user);//aquí se debe crear un metodo para conectar con la db y así poder "solicitar" 
         //el saldo en base al usuario
         
         if((user.equals("Erick")&&password.equals("123"))||(user.equals("Jefferson"))&&(password.equals("321"))){
