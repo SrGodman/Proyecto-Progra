@@ -4,12 +4,6 @@
  */
 package com.mycompany.proyecto_progra;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 /**
  *
  * @author erick
@@ -109,54 +103,29 @@ public class login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        String user=jTextField1.getText(), password=jPasswordField1.getText();
-        
-        double saldo = ObtenerSaldoDB(user);//aquí se debe crear un metodo para conectar con la db y así poder "solicitar" 
-        //el saldo en base al usuario
-        
-        if((user.equals("Erick")&&password.equals("123"))||(user.equals("Jefferson"))&&(password.equals("321"))){
-            pantalla_bancaria pb = new pantalla_bancaria(user,saldo);
-            pb.setVisible(true);
-            this.dispose();
-        }else{
-            Error err = new Error(this, true);
-            err.setVisible(true);
-        }
+
+    // 1. Leer los campos del formulario
+    String username = jTextField1.getText().trim();
+    String password = new String(jPasswordField1.getPassword()).trim();
+    //                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    // getPassword() es más seguro que getText() para contraseñas
+
+    // 2. Consultar la base de datos con UsuarioDAO
+    Usuario usuario = UsuarioDAO.login(username, password);
+
+    // 3. Evaluar resultado
+    if (usuario != null) {
+        // ✅ Credenciales correctas: pasar el objeto Usuario completo
+        pantalla_bancaria pb = new pantalla_bancaria(usuario);
+        pb.setVisible(true);
+        this.dispose(); // Cerrar ventana de login
+    } else {
+        // ❌ Credenciales incorrectas
+        Error err = new Error(this, true);
+        err.setVisible(true);
+    }
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    // Método para conectar a la base de datos y obtener el saldo
-    private double ObtenerSaldoDB(String nombreUsuario) {
-        double saldoEncontrado = 0.0; // Saldo por defecto si hay un error o no existe
-        String url = "jdbc:sqlite:bancoVirtual.db"; // La ruta de tu base de datos
-        
-        // Esta es la consulta SQL. Los signos de interrogación son para inyectar datos de forma segura.
-        // NOTA: Asumo que tienes una tabla llamada "Usuarios" con columnas "usuario" y "saldo"
-        String sql = "SELECT saldo FROM Usuarios WHERE usuario = ?";
-        
-        try (Connection conn = DriverManager.getConnection(url);
-             PreparedStatement pstmt  = conn.prepareStatement(sql)) {
-            
-            // Aquí reemplazamos el "?" con el nombre del usuario que intentó hacer login
-            pstmt.setString(1, nombreUsuario);
-            
-            // Ejecutamos la consulta y guardamos el resultado
-            ResultSet rs  = pstmt.executeQuery();
-            
-            // Si encontramos al usuario en la base de datos, extraemos su saldo
-            if (rs.next()) {
-                saldoEncontrado = rs.getDouble("saldo");
-            } else {
-                System.out.println("Usuario no encontrado en la base de datos.");
-            }
-            
-        } catch (SQLException e) {
-            System.out.println("Error al consultar la base de datos: " + e.getMessage());
-        }
-        
-        return saldoEncontrado;
-    }
-    
     /**
      * @param args the command line arguments
      */

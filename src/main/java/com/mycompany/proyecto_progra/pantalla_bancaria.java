@@ -15,14 +15,18 @@ public class pantalla_bancaria extends javax.swing.JFrame {
     /**
      * Creates new form pantalla_bancaria
      */
+    private Usuario usuarioActual;
+    
     public pantalla_bancaria() {
         initComponents();
     }
-    public pantalla_bancaria(String usuario, double saldo) {
-    initComponents();
     
-    jLabel1.setText("Bienvenido, "+usuario);
-    jLabel2.setText(String.format("Saldo: Q%.2f", saldo));
+    public pantalla_bancaria(Usuario usuario) {
+    initComponents();
+    this.usuarioActual = usuario;
+    
+    jLabel1.setText("Bienvenido, "+usuario.getUsername());
+    jLabel2.setText(String.format("Saldo: Q%.2f", usuario.getSaldo()));
 }
 
     /**
