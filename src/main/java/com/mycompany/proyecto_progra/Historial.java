@@ -11,6 +11,8 @@ package com.mycompany.proyecto_progra;
 public class Historial extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Historial.class.getName());
+    private Usuario usuarioActual;
+    private javax.swing.table.DefaultTableModel modeloTabla;
 
     /**
      * Creates new form Historial
@@ -18,6 +20,17 @@ public class Historial extends javax.swing.JFrame {
     public Historial() {
         initComponents();
     }
+    public Historial(Usuario usuario) {
+    initComponents();              // Dibuja el formulario (siempre va primero)
+    this.usuarioActual = usuario;  // Guarda quién inició sesión
+    jLabelUsuario.setText("Historial de: " + usuario.getUsername()); // Muestra el nombre
+    configurarTabla();             // Prepara las columnas de la tabla
+    cargarHistorial();             // Trae los datos de SQLite y los muestra
+
+    // Conecta los botones con sus métodos
+    jButtonTranseferir.addActionListener(e -> transferir());
+    jButtonVolver.addActionListener(e -> volver());
+}
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -44,17 +57,21 @@ public class Historial extends javax.swing.JFrame {
         jLabelUsuario.setText("jLabel1");
         jLabelUsuario.setToolTipText("");
 
+        jTextDestino.setColumns(15);
         jTextDestino.setText("Destino");
         jTextDestino.setToolTipText("");
         jTextDestino.setName("jTextDestino"); // NOI18N
         jTextDestino.addActionListener(this::jTextDestinoActionPerformed);
 
+        jTextMonto.setColumns(15);
         jTextMonto.setText("Monto");
         jTextMonto.setName(""); // NOI18N
 
+        jTextDescription.setColumns(15);
         jTextDescription.setText("Descripción");
 
         jButtonVolver.setText("Volver");
+        jButtonVolver.addActionListener(this::jButtonVolverActionPerformed);
 
         jButtonTranseferir.setText("Transferir");
 
@@ -76,46 +93,40 @@ public class Historial extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 780, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(38, 38, 38)
-                        .addComponent(jTextDestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(68, 68, 68)
-                        .addComponent(jTextMonto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(71, 71, 71)
-                        .addComponent(jTextDescription, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(60, 60, 60)
-                        .addComponent(jButtonVolver)
-                        .addGap(75, 75, 75)
-                        .addComponent(jButtonTranseferir))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabelUsuario))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 554, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(120, Short.MAX_VALUE))
+                        .addGap(6, 6, 6)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabelUsuario)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jTextDestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jTextMonto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jTextDescription, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButtonTranseferir)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButtonVolver)))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(25, 25, 25)
-                        .addComponent(jLabelUsuario)
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButtonVolver)
-                            .addComponent(jButtonTranseferir)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextDestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextMonto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(jLabelUsuario)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextDestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextMonto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonVolver)
+                    .addComponent(jButtonTranseferir))
+                .addGap(6, 6, 6)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTextDestino.getAccessibleContext().setAccessibleName("");
@@ -130,7 +141,7 @@ public class Historial extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 16, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -140,9 +151,108 @@ public class Historial extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextDestinoActionPerformed
 
+    private void jButtonVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonVolverActionPerformed
+        // TODO add your handling code here:
+        pantalla_bancaria pb = new pantalla_bancaria();
+        pb.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonVolverActionPerformed
+
     /**
      * @param args the command line arguments
      */
+    private void configurarTabla() {
+    // Define los títulos de las 4 columnas de la tabla
+    String[] columnas = {"Destino", "Monto", "Fecha", "Descripción"};
+    
+    modeloTabla = new javax.swing.table.DefaultTableModel(columnas, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false; // Evita que el usuario edite celdas directamente
+        }
+    };
+    jTable1.setModel(modeloTabla); // Le asigna el modelo a la tabla visual
+}
+    private void cargarHistorial() {
+    modeloTabla.setRowCount(0); // Borra las filas anteriores para no duplicar
+    
+    // Consulta SQLite y por cada resultado agrega una fila a la tabla
+    for (Object[] fila : TransferenciaDAO.obtenerPorUsuario(usuarioActual.getId())) {
+        modeloTabla.addRow(fila);
+    }
+}
+    private void transferir() {
+    // Lee lo que el usuario escribió en los campos
+    String destino     = jTextDestino.getText().trim();
+    String montoTexto  = jTextMonto.getText().trim();
+    String descripcion = jTextDescription.getText().trim();
+
+    // Validación 1: campos obligatorios no vacíos
+    if (destino.isEmpty() || montoTexto.isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "Destino y monto son obligatorios.",
+            "Campos vacíos",
+            javax.swing.JOptionPane.WARNING_MESSAGE);
+        return; // Para aquí si hay error
+    }
+
+    try {
+        double monto = Double.parseDouble(montoTexto); // Convierte texto a número
+
+        // Validación 2: monto positivo
+        if (monto <= 0) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "El monto debe ser mayor a cero.",
+                "Monto inválido",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Validación 3: saldo suficiente
+        if (monto > usuarioActual.getSaldo()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Saldo insuficiente.\nSaldo actual: Q" +
+                String.format("%.2f", usuarioActual.getSaldo()),
+                "Sin fondos",
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Todo OK: guarda en SQLite
+        TransferenciaDAO.registrar(
+            usuarioActual.getId(), destino, monto, descripcion
+        );
+
+        // Descuenta el monto del saldo en memoria
+        usuarioActual.setSaldo(usuarioActual.getSaldo() - monto);
+
+        // Limpia los campos del formulario
+        jTextDestino.setText("");
+        jTextMonto.setText("");
+        jTextDescription.setText("");
+        
+        cargarHistorial(); // Recarga la tabla con la nueva transferencia
+
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "¡Transferencia exitosa!\nNuevo saldo: Q" +
+            String.format("%.2f", usuarioActual.getSaldo()),
+            "Éxito",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+    } catch (NumberFormatException e) {
+        // Se dispara si escriben letras en el campo monto
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "El monto debe ser un número válido.\nEjemplo: 150.00",
+            "Formato inválido",
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
+}
+    private void volver() {
+    // Abre pantalla_bancaria pasando el usuario con el saldo actualizado
+    pantalla_bancaria pb = new pantalla_bancaria(usuarioActual);
+    pb.setVisible(true);
+    this.dispose(); // Cierra esta ventana
+}
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

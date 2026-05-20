@@ -116,11 +116,11 @@ public class login extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
-    // 1. Leer los campos del formulario
+    // 1. Lee los campos del formulario
     String username = jTextField1.getText().trim();
     String password = new String(jPasswordField1.getPassword()).trim();
     //                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    // getPassword() es más seguro que getText() para contraseñas
+    // getPassword() es más seguro que getText() para contraseñas ;3
 
     // 2. Consultar la base de datos con UsuarioDAO
     Usuario usuario = UsuarioDAO.login(username, password);
