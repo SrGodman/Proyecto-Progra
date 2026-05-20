@@ -223,8 +223,11 @@ public class Historial extends javax.swing.JFrame {
             usuarioActual.getId(), destino, monto, descripcion
         );
 
-        // Descuenta el monto del saldo en memoria
+        // Descuenta el saldo en memoria
         usuarioActual.setSaldo(usuarioActual.getSaldo() - monto);
+
+        // ✅ Guarda el nuevo saldo en SQLite
+        UsuarioDAO.actualizarSaldo(usuarioActual.getId(), usuarioActual.getSaldo());
 
         // Limpia los campos del formulario
         jTextDestino.setText("");

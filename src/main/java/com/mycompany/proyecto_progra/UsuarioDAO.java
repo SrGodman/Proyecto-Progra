@@ -12,6 +12,20 @@ public class UsuarioDAO {
      * Busca en la BD si existe un usuario con ese username y password.
      * Retorna un objeto Usuario si lo encuentra, o null si no existe.
      */
+    public static void actualizarSaldo(int usuarioId, double nuevoSaldo) {
+    String sql = "UPDATE usuarios SET saldo = ? WHERE id = ?";
+    
+    try (Connection conn = DataBaseManager.conectar();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        
+        pstmt.setDouble(1, nuevoSaldo);
+        pstmt.setInt(2, usuarioId);
+        pstmt.executeUpdate();
+        
+    } catch (SQLException e) {
+        System.out.println("Error al actualizar saldo: " + e.getMessage());
+    }
+}
     public static Usuario login(String username, String password) {
         String sql = "SELECT id, username, saldo FROM usuarios WHERE username = ? AND password = ?";
         
@@ -35,6 +49,7 @@ public class UsuarioDAO {
         }
         return null;
     }
+    
 
     /**
      * Método para registrar a un usuario con saldo de Q100 (Según el Diagrama)

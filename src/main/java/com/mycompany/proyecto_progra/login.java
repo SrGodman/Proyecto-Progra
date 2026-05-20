@@ -140,22 +140,43 @@ public class login extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        // Este es el código que va dentro del botón "Registrarse"
     String nU = javax.swing.JOptionPane.showInputDialog(this, "Nombre de usuario:");
     if (nU == null || nU.trim().isEmpty()) return;
 
     String nP = javax.swing.JOptionPane.showInputDialog(this, "Contraseña:");
     if (nP == null || nP.trim().isEmpty()) return;
 
+    // ✅ Validación de longitud mínima
+    if (nU.trim().length() < 3 || nP.trim().length() < 3) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "Usuario y contraseña deben tener al menos 3 caracteres.",
+            "Demasiado corto",
+            javax.swing.JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
     int res = UsuarioDAO.registrar(nU.trim(), nP.trim());
 
-    if (res == 1) {
-        javax.swing.JOptionPane.showMessageDialog(this, "¡Registrado! Tienes Q100 de regalo.");
-    } else if (res == 0) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Ese usuario ya existe.", "Aviso", 2);
-    } else {
-        javax.swing.JOptionPane.showMessageDialog(this, "Error en la base de datos.", "Error", 0);
+    switch (res) {
+        case 1 ->
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "¡Registrado exitosamente!\n" +
+                "Usuario: " + nU.trim() + "\n" +
+                "Saldo inicial: Q100.00",
+                "Éxito",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        case 0 ->
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "El usuario '" + nU.trim() + "' ya existe.\nElige otro nombre.",
+                "Usuario no disponible",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+        case -1 ->
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Error en la base de datos.",
+                "Error",
+                javax.swing.JOptionPane.ERROR_MESSAGE);
     }
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
