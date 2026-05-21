@@ -19,9 +19,11 @@ public class Historial extends javax.swing.JFrame {
      */
     public Historial() {
         initComponents();
+        this.setLocationRelativeTo(null);
     }
     public Historial(Usuario usuario) {
     initComponents();              // Dibuja el formulario (siempre va primero)
+            this.setLocationRelativeTo(null);
     this.usuarioActual = usuario;  // Guarda quién inició sesión
     jLabelUsuario.setText("Historial de: " + usuario.getUsername()); // Muestra el nombre
     configurarTabla();             // Prepara las columnas de la tabla
@@ -53,27 +55,44 @@ public class Historial extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jPanel1.setBackground(new java.awt.Color(30, 58, 131));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
         jLabelUsuario.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabelUsuario.setForeground(new java.awt.Color(255, 255, 255));
         jLabelUsuario.setText("jLabel1");
         jLabelUsuario.setToolTipText("");
+        jPanel1.add(jLabelUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 6, -1, -1));
 
         jTextDestino.setColumns(15);
         jTextDestino.setText("Destino");
         jTextDestino.setToolTipText("");
         jTextDestino.setName("jTextDestino"); // NOI18N
         jTextDestino.addActionListener(this::jTextDestinoActionPerformed);
+        jPanel1.add(jTextDestino, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 39, -1, -1));
+        jTextDestino.getAccessibleContext().setAccessibleName("");
 
         jTextMonto.setColumns(15);
         jTextMonto.setText("Monto");
         jTextMonto.setName(""); // NOI18N
+        jPanel1.add(jTextMonto, new org.netbeans.lib.awtextra.AbsoluteConstraints(209, 39, -1, -1));
 
         jTextDescription.setColumns(15);
         jTextDescription.setText("Descripción");
+        jPanel1.add(jTextDescription, new org.netbeans.lib.awtextra.AbsoluteConstraints(406, 37, -1, 26));
 
+        jButtonVolver.setBackground(new java.awt.Color(16, 185, 129));
+        jButtonVolver.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jButtonVolver.setForeground(new java.awt.Color(255, 255, 255));
         jButtonVolver.setText("Volver");
         jButtonVolver.addActionListener(this::jButtonVolverActionPerformed);
+        jPanel1.add(jButtonVolver, new org.netbeans.lib.awtextra.AbsoluteConstraints(701, 38, -1, -1));
 
+        jButtonTranseferir.setBackground(new java.awt.Color(16, 185, 129));
+        jButtonTranseferir.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jButtonTranseferir.setForeground(new java.awt.Color(255, 255, 255));
         jButtonTranseferir.setText("Transferir");
+        jPanel1.add(jButtonTranseferir, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 38, -1, -1));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -88,60 +107,17 @@ public class Historial extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 780, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabelUsuario)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jTextDestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jTextMonto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jTextDescription, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jButtonTranseferir)
-                                .addGap(18, 18, 18)
-                                .addComponent(jButtonVolver)))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabelUsuario)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextDestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextMonto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonVolver)
-                    .addComponent(jButtonTranseferir))
-                .addGap(6, 6, 6)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        jTextDestino.getAccessibleContext().setAccessibleName("");
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 69, 780, 343));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 792, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 418, Short.MAX_VALUE)
         );
 
         pack();
