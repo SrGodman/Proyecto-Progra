@@ -61,23 +61,30 @@ public class DataBaseManager {
 }
 
 private static void insertarUsuariosPorDefecto() {
-    String insertarErick = """
-        INSERT OR IGNORE INTO usuarios (username, password, saldo)
-        VALUES ('Erick', '123', 5000.00);
-    """;
+    String verificar = "SELECT COUNT(*) FROM usuarios WHERE username = ?";
+    String insertar  = "INSERT INTO usuarios (username, password, saldo) VALUES (?, ?, ?)";
 
-    String insertarJefferson = """
-        INSERT OR IGNORE INTO usuarios (username, password, saldo)
-        VALUES ('Jefferson', '321', 3000.00);
-    """;
+    String[][] usuarios = {
+        {"Erick",     "123", "5000.0"},
+        {"Jefferson", "321", "3000.0"}
+    };
 
-    try (Connection conn = conectar();
-         Statement stmt = conn.createStatement()) {
-
-        stmt.execute(insertarErick);
-        stmt.execute(insertarJefferson);
-        System.out.println("Usuarios por defecto listos.");
-
+    try (Connection conn = conectar()) {
+        for (String[] u : usuarios) {
+            // Primero verifica si ya existe
+            try (PreparedStatement check = conn.prepareStatement(verificar)) {
+                check.setString(1, u[0]);
+                ResultSet rs = check.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) continue; // Ya existe, skip
+            }
+            // Solo inserta si no existe, sin desperdiciar IDs
+            try (PreparedStatement ins = conn.prepareStatement(insertar)) {
+                ins.setString(1, u[0]);
+                ins.setString(2, u[1]);
+                ins.setDouble(3, Double.parseDouble(u[2]));
+                ins.executeUpdate();
+            }
+        }
     } catch (SQLException e) {
         System.out.println("Error al insertar usuarios: " + e.getMessage());
     }
