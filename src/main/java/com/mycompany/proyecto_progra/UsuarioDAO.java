@@ -76,4 +76,27 @@ public class UsuarioDAO {
             return -1; // Otro error
         }
     }
+    // Busca un usuario por su nombre de usuario
+public static Usuario buscarPorUsername(String username) {
+    String sql = "SELECT id, username, saldo FROM usuarios WHERE username = ?";
+
+    try (Connection conn = DataBaseManager.conectar();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        pstmt.setString(1, username);
+        ResultSet rs = pstmt.executeQuery();
+
+        if (rs.next()) {
+            return new Usuario(
+                rs.getInt("id"),
+                rs.getString("username"),
+                rs.getDouble("saldo")
+            );
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Error al buscar usuario: " + e.getMessage());
+    }
+    return null;
+}
 }

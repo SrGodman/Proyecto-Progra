@@ -153,25 +153,31 @@ public class Historial extends javax.swing.JFrame {
         modeloTabla.addRow(fila);
     }
 }
-    private void transferir() {
-    // Lee lo que el usuario escribió en los campos
+private void transferir() {
     String destino     = jTextDestino.getText().trim();
     String montoTexto  = jTextMonto.getText().trim();
     String descripcion = jTextDescription.getText().trim();
 
-    // Validación 1: campos obligatorios no vacíos
     if (destino.isEmpty() || montoTexto.isEmpty()) {
         javax.swing.JOptionPane.showMessageDialog(this,
             "Destino y monto son obligatorios.",
             "Campos vacíos",
             javax.swing.JOptionPane.WARNING_MESSAGE);
-        return; // Para aquí si hay error
+        return;
+    }
+
+    // Validar que no se transfiera a sí mismo
+    if (destino.equalsIgnoreCase(usuarioActual.getUsername())) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "No puedes transferirte dinero a ti mismo.",
+            "Destino inválido",
+            javax.swing.JOptionPane.WARNING_MESSAGE);
+        return;
     }
 
     try {
-        double monto = Double.parseDouble(montoTexto); // Convierte texto a número
+        double monto = Double.parseDouble(montoTexto);
 
-        // Validación 2: monto positivo
         if (monto <= 0) {
             javax.swing.JOptionPane.showMessageDialog(this,
                 "El monto debe ser mayor a cero.",
@@ -180,7 +186,6 @@ public class Historial extends javax.swing.JFrame {
             return;
         }
 
-        // Validación 3: saldo suficiente
         if (monto > usuarioActual.getSaldo()) {
             javax.swing.JOptionPane.showMessageDialog(this,
                 "Saldo insuficiente.\nSaldo actual: Q" +
@@ -190,32 +195,30 @@ public class Historial extends javax.swing.JFrame {
             return;
         }
 
-        // Todo OK: guarda en SQLite
-        TransferenciaDAO.registrar(
-            usuarioActual.getId(), destino, monto, descripcion
+        // Llama al nuevo registrar() que maneja ambos usuarios
+        boolean exito = TransferenciaDAO.registrar(
+            usuarioActual, destino, monto, descripcion
         );
 
-        //Descuenta el saldo en memoria
-        usuarioActual.setSaldo(usuarioActual.getSaldo() - monto);
+        if (exito) {
+            jTextDestino.setText("");
+            jTextMonto.setText("");
+            jTextDescription.setText("");
+            cargarHistorial();
 
-        //Guarda el nuevo saldo en SQLite
-        UsuarioDAO.actualizarSaldo(usuarioActual.getId(), usuarioActual.getSaldo());
-
-        // Limpia los campos del formulario
-        jTextDestino.setText("");
-        jTextMonto.setText("");
-        jTextDescription.setText("");
-        
-        cargarHistorial(); // Recarga la tabla con la nueva transferencia
-
-        javax.swing.JOptionPane.showMessageDialog(this,
-            "¡Transferencia exitosa!\nNuevo saldo: Q" +
-            String.format("%.2f", usuarioActual.getSaldo()),
-            "Éxito",
-            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "¡Transferencia exitosa!\nNuevo saldo: Q" +
+                String.format("%.2f", usuarioActual.getSaldo()),
+                "Éxito",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "El usuario '" + destino + "' no existe.\nVerifica el nombre.",
+                "Usuario no encontrado",
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
 
     } catch (NumberFormatException e) {
-        // Se dispara si escriben letras en el campo monto
         javax.swing.JOptionPane.showMessageDialog(this,
             "El monto debe ser un número válido.\nEjemplo: 150.00",
             "Formato inválido",
