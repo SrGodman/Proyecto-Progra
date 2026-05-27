@@ -112,15 +112,20 @@ public class pantalla_bancaria extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        this.dispose();
-        Historial historial = new Historial(usuarioActual);
-        historial.setVisible(true);
+    Historial historial = new Historial(usuarioActual, this); // <- pasa "this"
+    historial.setVisible(true);
+    this.setVisible(false); // Oculta en lugar de dispose()
         
     }//GEN-LAST:event_jButton1ActionPerformed
-
+    public void actualizarSaldo(Usuario usuario) {
+    this.usuarioActual = usuario;
+    jLabel1.setText("Bienvenido, " + usuario.getUsername());
+    jLabel2.setText(String.format("Saldo: Q%.2f", usuario.getSaldo()));
+}
     /**
      * @param args the command line arguments
      */
+    
     public void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

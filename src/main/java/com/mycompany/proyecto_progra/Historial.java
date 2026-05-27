@@ -9,10 +9,10 @@ package com.mycompany.proyecto_progra;
  * @author erick
  */
 public class Historial extends javax.swing.JFrame {
-    
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Historial.class.getName());
     private Usuario usuarioActual;
     private javax.swing.table.DefaultTableModel modeloTabla;
+    private pantalla_bancaria ventanaAnterior;
 
     /**
      * Creates new form Historial
@@ -21,15 +21,13 @@ public class Historial extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
     }
-    public Historial(Usuario usuario) {
-    initComponents();              // Dibuja el formulario (siempre va primero)
-            this.setLocationRelativeTo(null);
-    this.usuarioActual = usuario;  // Guarda quién inició sesión
-    jLabelUsuario.setText("Historial de: " + usuario.getUsername()); // Muestra el nombre
-    configurarTabla();             // Prepara las columnas de la tabla
-    cargarHistorial();             // Trae los datos de SQLite y los muestra
-
-    // Conecta los botones con sus métodos
+    public Historial(Usuario usuario, pantalla_bancaria ventana) {
+    initComponents();
+    this.usuarioActual   = usuario;
+    this.ventanaAnterior = ventana; // Guarda la referencia a la ventana anterior
+    jLabelUsuario.setText("Historial de: " + usuario.getUsername());
+    configurarTabla();
+    cargarHistorial();
     jButtonTranseferir.addActionListener(e -> transferir());
     jButtonVolver.addActionListener(e -> volver());
 }
@@ -129,9 +127,7 @@ public class Historial extends javax.swing.JFrame {
 
     private void jButtonVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonVolverActionPerformed
         // TODO add your handling code here:
-        pantalla_bancaria pb = new pantalla_bancaria();
-        pb.setVisible(true);
-        this.dispose();
+        volver();
     }//GEN-LAST:event_jButtonVolverActionPerformed
 
     /**
@@ -199,10 +195,10 @@ public class Historial extends javax.swing.JFrame {
             usuarioActual.getId(), destino, monto, descripcion
         );
 
-        // Descuenta el saldo en memoria
+        //Descuenta el saldo en memoria
         usuarioActual.setSaldo(usuarioActual.getSaldo() - monto);
 
-        // ✅ Guarda el nuevo saldo en SQLite
+        //Guarda el nuevo saldo en SQLite
         UsuarioDAO.actualizarSaldo(usuarioActual.getId(), usuarioActual.getSaldo());
 
         // Limpia los campos del formulario
@@ -227,11 +223,11 @@ public class Historial extends javax.swing.JFrame {
     }
 }
     private void volver() {
-    // Abre pantalla_bancaria pasando el usuario con el saldo actualizado
-    pantalla_bancaria pb = new pantalla_bancaria(usuarioActual);
-    pb.setVisible(true);
-    this.dispose(); // Cierra esta ventana
+    ventanaAnterior.actualizarSaldo(usuarioActual); // Refresca el saldo
+    ventanaAnterior.setVisible(true); // Muestra la ventana que ya existía
+    this.dispose();
 }
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
