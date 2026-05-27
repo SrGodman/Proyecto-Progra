@@ -12,37 +12,75 @@ import java.util.List;
 
 public class TransferenciaDAO {
 
-    // Guardar una nueva transferencia en la DB
-    public static void registrar(int usuarioId, String destino, double monto, String descripcion) {
-        String sql = """
-            INSERT INTO transferencias (usuario_id, origen, destino, monto, fecha, descripcion)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """;
-        // Tomamos la fecha y hora actual automáticamente
-        String fecha = LocalDateTime.now()
-                       .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    public static boolean registrar(Usuario emisor, String destinoUsername,
+                                 double monto, String descripcion) {
+    Usuario destinatario = UsuarioDAO.buscarPorUsername(destinoUsername);
+    if (destinatario == null) return false;
+    if (emisor.getUsername().equalsIgnoreCase(destinoUsername)) return false;
 
-        try (Connection conn = DataBaseManager.conectar();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    String fecha = LocalDateTime.now()
+                   .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-            pstmt.setInt(1, usuarioId);
-            pstmt.setString(2, "Cuenta propia");  // El origen siempre es el usuario actual
-            pstmt.setString(3, destino);
+    String sqlTransferencia = """
+        INSERT INTO transferencias (usuario_id, origen, destino, monto, fecha, descripcion)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """;
+
+    try (Connection conn = DataBaseManager.conectar()) {
+        conn.setAutoCommit(false);
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sqlTransferencia)) {
+
+            // Registro emisor
+            pstmt.setInt(1, emisor.getId());
+            pstmt.setString(2, emisor.getUsername());
+            pstmt.setString(3, destinoUsername);
             pstmt.setDouble(4, monto);
             pstmt.setString(5, fecha);
             pstmt.setString(6, descripcion);
             pstmt.executeUpdate();
 
-        } catch (SQLException e) {
-            System.out.println("Error al registrar transferencia: " + e.getMessage());
+            // Registro destinatario
+            pstmt.setInt(1, destinatario.getId());
+            pstmt.setString(2, emisor.getUsername());
+            pstmt.setString(3, "RECIBIDO");
+            pstmt.setDouble(4, monto);
+            pstmt.setString(5, fecha);
+            pstmt.setString(6, descripcion);
+            pstmt.executeUpdate();
         }
-    }
 
-    // Obtener SOLO las transferencias del usuario logueado
+        // Actualizar saldos dentro de la misma transacción
+        try (PreparedStatement pstmtSaldo = conn.prepareStatement(
+                "UPDATE usuarios SET saldo = ? WHERE id = ?")) {
+
+            double nuevoSaldoEmisor       = emisor.getSaldo() - monto;
+            double nuevoSaldoDestinatario = destinatario.getSaldo() + monto;
+
+            pstmtSaldo.setDouble(1, nuevoSaldoEmisor);
+            pstmtSaldo.setInt(2, emisor.getId());
+            pstmtSaldo.executeUpdate();
+
+            pstmtSaldo.setDouble(1, nuevoSaldoDestinatario);
+            pstmtSaldo.setInt(2, destinatario.getId());
+            pstmtSaldo.executeUpdate();
+        }
+
+        conn.commit(); // ✅ Todo junto en una sola transacción
+
+        emisor.setSaldo(emisor.getSaldo() - monto); // Actualiza memoria
+        return true;
+
+    } catch (SQLException e) {
+        System.out.println("Error en transferencia: " + e.getMessage());
+        return false;
+    }
+}
+
     public static List<Object[]> obtenerPorUsuario(int usuarioId) {
         List<Object[]> lista = new ArrayList<>();
         String sql = """
-            SELECT destino, monto, fecha, descripcion
+            SELECT origen, destino, monto, fecha, descripcion
             FROM transferencias
             WHERE usuario_id = ?
             ORDER BY fecha DESC
@@ -55,11 +93,25 @@ public class TransferenciaDAO {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
+                String origen  = rs.getString("origen");
+                String destino = rs.getString("destino");
+                double monto   = rs.getDouble("monto");
+                String fecha   = rs.getString("fecha");
+                String desc    = rs.getString("descripcion");
+
+                // Determina si fue enviada o recibida
+                String leyenda;
+                if (destino.equals("RECIBIDO")) {
+                    leyenda = "📥 Recibido de: " + origen;
+                } else {
+                    leyenda = "📤 Enviado a: " + destino;
+                }
+
                 lista.add(new Object[]{
-                    rs.getString("destino"),
-                    String.format("Q%.2f", rs.getDouble("monto")),
-                    rs.getString("fecha"),
-                    rs.getString("descripcion")
+                    leyenda,
+                    String.format("Q%.2f", monto),
+                    fecha,
+                    desc != null ? desc : ""
                 });
             }
 

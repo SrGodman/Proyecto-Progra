@@ -11,6 +11,9 @@ package com.mycompany.proyecto_progra;
 public class Tarjetas extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Tarjetas.class.getName());
+    private Usuario usuarioActual;
+    private Tarjeta tarjetaActual;
+    private pantalla_bancaria ventanaAnterior;
 
     /**
      * Creates new form Tarjetas
@@ -19,6 +22,14 @@ public class Tarjetas extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
     }
+    public Tarjetas(Usuario usuario, pantalla_bancaria ventana) {
+    initComponents();
+    this.usuarioActual  = usuario;
+    this.ventanaAnterior = ventana;
+    cargarDatos();
+    jButtonCargar.addActionListener(e -> cargarSaldo());
+    jButtonVolver.addActionListener(e -> volver());
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -30,6 +41,12 @@ public class Tarjetas extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        jLabelTitulo = new javax.swing.JLabel();
+        jLabelNumero = new javax.swing.JLabel();
+        jLabelSaldo = new javax.swing.JLabel();
+        jTextCarga = new javax.swing.JTextField();
+        jButtonCargar = new javax.swing.JButton();
+        jButtonVolver = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -37,6 +54,25 @@ public class Tarjetas extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(30, 58, 131));
         jPanel1.setPreferredSize(new java.awt.Dimension(900, 600));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabelTitulo.setText("Mis Tarjetas");
+        jPanel1.add(jLabelTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, -1, -1));
+
+        jLabelNumero.setText("Numero");
+        jPanel1.add(jLabelNumero, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 70, -1, -1));
+
+        jLabelSaldo.setText("Saldo");
+        jPanel1.add(jLabelSaldo, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, -1, 20));
+
+        jTextCarga.setColumns(12);
+        jTextCarga.setText("Monto a Cargar");
+        jPanel1.add(jTextCarga, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 140, -1, -1));
+
+        jButtonCargar.setText("Cargar Saldo");
+        jPanel1.add(jButtonCargar, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 140, -1, -1));
+
+        jButtonVolver.setText("Volver");
+        jPanel1.add(jButtonVolver, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 140, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -55,7 +91,74 @@ public class Tarjetas extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+private void cargarDatos() {
+    tarjetaActual = TarjetaDAO.obtenerPorUsuario(usuarioActual.getId());
 
+    if (tarjetaActual != null) {
+        jLabelNumero.setText("Número: " + tarjetaActual.getNumero());
+        jLabelSaldo.setText(String.format("Saldo: Q%.2f", tarjetaActual.getSaldo()));
+    } else {
+        jLabelNumero.setText("No tienes tarjeta asignada.");
+        jLabelSaldo.setText("");
+    }
+}
+
+private void cargarSaldo() {
+    String montoTexto = jTextCarga.getText().trim();
+
+    if (montoTexto.isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "Ingresa un monto a cargar.",
+            "Campo vacío",
+            javax.swing.JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    try {
+        double monto = Double.parseDouble(montoTexto);
+
+        if (monto <= 0) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "El monto debe ser mayor a cero.",
+                "Monto inválido",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (monto > usuarioActual.getSaldo()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Saldo insuficiente en cuenta.\nSaldo disponible: Q" +
+                String.format("%.2f", usuarioActual.getSaldo()),
+                "Sin fondos",
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        boolean exito = TarjetaDAO.cargarSaldo(usuarioActual, monto);
+
+        if (exito) {
+            jTextCarga.setText("");
+            cargarDatos(); // Refresca el saldo de la tarjeta
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Saldo cargado exitosamente.\nNuevo saldo tarjeta: Q" +
+                String.format("%.2f", tarjetaActual.getSaldo()),
+                "Exito",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
+
+    } catch (NumberFormatException e) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "El monto debe ser un número válido.\nEjemplo: 50.00",
+            "Formato inválido",
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
+}
+
+private void volver() {
+    ventanaAnterior.actualizarSaldo(usuarioActual);
+    ventanaAnterior.setVisible(true);
+    this.dispose();
+}
     /**
      * @param args the command line arguments
      */
@@ -82,6 +185,12 @@ public class Tarjetas extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonCargar;
+    private javax.swing.JButton jButtonVolver;
+    private javax.swing.JLabel jLabelNumero;
+    private javax.swing.JLabel jLabelSaldo;
+    private javax.swing.JLabel jLabelTitulo;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JTextField jTextCarga;
     // End of variables declaration//GEN-END:variables
 }

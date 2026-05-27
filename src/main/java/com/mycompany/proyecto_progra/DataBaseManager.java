@@ -45,12 +45,23 @@ public class DataBaseManager {
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
         );
     """;
+    
+    String crearTarjetas = """
+    CREATE TABLE IF NOT EXISTS tarjetas (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        usuario_id  INTEGER NOT NULL UNIQUE,
+        numero      TEXT    NOT NULL UNIQUE,
+        saldo       REAL    NOT NULL DEFAULT 0,
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    );
+""";
 
     try (Connection conn = conectar();
          Statement stmt = conn.createStatement()) {
 
         stmt.execute(crearUsuarios);
         stmt.execute(crearTransferencias);
+        stmt.execute(crearTarjetas);
         System.out.println("Tablas listas.");
 
     } catch (SQLException e) {
@@ -61,25 +72,61 @@ public class DataBaseManager {
 }
 
 private static void insertarUsuariosPorDefecto() {
-    String insertarErick = """
-        INSERT OR IGNORE INTO usuarios (username, password, saldo)
-        VALUES ('Erick', '123', 5000.00);
-    """;
+    String verificar = "SELECT COUNT(*) FROM usuarios WHERE username = ?";
+    String insertar  = "INSERT INTO usuarios (username, password, saldo) VALUES (?, ?, ?)";
 
-    String insertarJefferson = """
-        INSERT OR IGNORE INTO usuarios (username, password, saldo)
-        VALUES ('Jefferson', '321', 3000.00);
-    """;
+    String[][] usuarios = {
+        {"Erick",     "123", "5000.0"},
+        {"Jefferson", "321", "3000.0"}
+    };
 
-    try (Connection conn = conectar();
-         Statement stmt = conn.createStatement()) {
-
-        stmt.execute(insertarErick);
-        stmt.execute(insertarJefferson);
-        System.out.println("Usuarios por defecto listos.");
-
+    try (Connection conn = conectar()) {
+        for (String[] u : usuarios) {
+            // Primero verifica si ya existe
+            try (PreparedStatement check = conn.prepareStatement(verificar)) {
+                check.setString(1, u[0]);
+                ResultSet rs = check.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) continue; // Ya existe, skip
+            }
+            // Solo inserta si no existe, sin desperdiciar IDs
+            try (PreparedStatement ins = conn.prepareStatement(insertar)) {
+                ins.setString(1, u[0]);
+                ins.setString(2, u[1]);
+                ins.setDouble(3, Double.parseDouble(u[2]));
+                ins.executeUpdate();
+            }
+        }
     } catch (SQLException e) {
         System.out.println("Error al insertar usuarios: " + e.getMessage());
+    }
+
+    // Crear tarjetas para usuarios por defecto si no tienen
+    String verificarTarjeta = "SELECT COUNT(*) FROM tarjetas WHERE usuario_id = ?";
+    String idQuery = "SELECT id FROM usuarios WHERE username = ?";
+    String[] defaultUsers = {"Erick", "Jefferson"};
+
+    try (Connection conn = conectar()) {
+        for (String username : defaultUsers) {
+
+            int userId = -1;
+            try (PreparedStatement ps = conn.prepareStatement(idQuery)) {
+                ps.setString(1, username);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) userId = rs.getInt("id");
+            }
+
+            if (userId == -1) continue;
+
+            try (PreparedStatement check = conn.prepareStatement(verificarTarjeta)) {
+                check.setInt(1, userId);
+                ResultSet rs = check.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) continue; // Ya tiene tarjeta
+            }
+
+            TarjetaDAO.crear(userId); // Crea la tarjeta
+        }
+    } catch (SQLException e) {
+        System.out.println("Error al crear tarjetas por defecto: " + e.getMessage());
     }
 }
 

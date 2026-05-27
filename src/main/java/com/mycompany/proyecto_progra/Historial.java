@@ -9,10 +9,10 @@ package com.mycompany.proyecto_progra;
  * @author erick
  */
 public class Historial extends javax.swing.JFrame {
-    
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Historial.class.getName());
     private Usuario usuarioActual;
     private javax.swing.table.DefaultTableModel modeloTabla;
+    private pantalla_bancaria ventanaAnterior;
 
     /**
      * Creates new form Historial
@@ -21,15 +21,13 @@ public class Historial extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
     }
-    public Historial(Usuario usuario) {
-    initComponents();              // Dibuja el formulario (siempre va primero)
-            this.setLocationRelativeTo(null);
-    this.usuarioActual = usuario;  // Guarda quién inició sesión
-    jLabelUsuario.setText("Historial de: " + usuario.getUsername()); // Muestra el nombre
-    configurarTabla();             // Prepara las columnas de la tabla
-    cargarHistorial();             // Trae los datos de SQLite y los muestra
-
-    // Conecta los botones con sus métodos
+    public Historial(Usuario usuario, pantalla_bancaria ventana) {
+    initComponents();
+    this.usuarioActual   = usuario;
+    this.ventanaAnterior = ventana; // Guarda la referencia a la ventana anterior
+    jLabelUsuario.setText("Historial de: " + usuario.getUsername());
+    configurarTabla();
+    cargarHistorial();
     jButtonTranseferir.addActionListener(e -> transferir());
     jButtonVolver.addActionListener(e -> volver());
 }
@@ -129,9 +127,7 @@ public class Historial extends javax.swing.JFrame {
 
     private void jButtonVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonVolverActionPerformed
         // TODO add your handling code here:
-        pantalla_bancaria pb = new pantalla_bancaria();
-        pb.setVisible(true);
-        this.dispose();
+        volver();
     }//GEN-LAST:event_jButtonVolverActionPerformed
 
     /**
@@ -157,25 +153,31 @@ public class Historial extends javax.swing.JFrame {
         modeloTabla.addRow(fila);
     }
 }
-    private void transferir() {
-    // Lee lo que el usuario escribió en los campos
+private void transferir() {
     String destino     = jTextDestino.getText().trim();
     String montoTexto  = jTextMonto.getText().trim();
     String descripcion = jTextDescription.getText().trim();
 
-    // Validación 1: campos obligatorios no vacíos
     if (destino.isEmpty() || montoTexto.isEmpty()) {
         javax.swing.JOptionPane.showMessageDialog(this,
             "Destino y monto son obligatorios.",
             "Campos vacíos",
             javax.swing.JOptionPane.WARNING_MESSAGE);
-        return; // Para aquí si hay error
+        return;
+    }
+
+    // Validar que no se transfiera a sí mismo
+    if (destino.equalsIgnoreCase(usuarioActual.getUsername())) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "No puedes transferirte dinero a ti mismo.",
+            "Destino inválido",
+            javax.swing.JOptionPane.WARNING_MESSAGE);
+        return;
     }
 
     try {
-        double monto = Double.parseDouble(montoTexto); // Convierte texto a número
+        double monto = Double.parseDouble(montoTexto);
 
-        // Validación 2: monto positivo
         if (monto <= 0) {
             javax.swing.JOptionPane.showMessageDialog(this,
                 "El monto debe ser mayor a cero.",
@@ -184,7 +186,6 @@ public class Historial extends javax.swing.JFrame {
             return;
         }
 
-        // Validación 3: saldo suficiente
         if (monto > usuarioActual.getSaldo()) {
             javax.swing.JOptionPane.showMessageDialog(this,
                 "Saldo insuficiente.\nSaldo actual: Q" +
@@ -194,32 +195,30 @@ public class Historial extends javax.swing.JFrame {
             return;
         }
 
-        // Todo OK: guarda en SQLite
-        TransferenciaDAO.registrar(
-            usuarioActual.getId(), destino, monto, descripcion
+        // Llama al nuevo registrar() que maneja ambos usuarios
+        boolean exito = TransferenciaDAO.registrar(
+            usuarioActual, destino, monto, descripcion
         );
 
-        // Descuenta el saldo en memoria
-        usuarioActual.setSaldo(usuarioActual.getSaldo() - monto);
+        if (exito) {
+            jTextDestino.setText("");
+            jTextMonto.setText("");
+            jTextDescription.setText("");
+            cargarHistorial();
 
-        // ✅ Guarda el nuevo saldo en SQLite
-        UsuarioDAO.actualizarSaldo(usuarioActual.getId(), usuarioActual.getSaldo());
-
-        // Limpia los campos del formulario
-        jTextDestino.setText("");
-        jTextMonto.setText("");
-        jTextDescription.setText("");
-        
-        cargarHistorial(); // Recarga la tabla con la nueva transferencia
-
-        javax.swing.JOptionPane.showMessageDialog(this,
-            "¡Transferencia exitosa!\nNuevo saldo: Q" +
-            String.format("%.2f", usuarioActual.getSaldo()),
-            "Éxito",
-            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "¡Transferencia exitosa!\nNuevo saldo: Q" +
+                String.format("%.2f", usuarioActual.getSaldo()),
+                "Éxito",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "El usuario '" + destino + "' no existe.\nVerifica el nombre.",
+                "Usuario no encontrado",
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
 
     } catch (NumberFormatException e) {
-        // Se dispara si escriben letras en el campo monto
         javax.swing.JOptionPane.showMessageDialog(this,
             "El monto debe ser un número válido.\nEjemplo: 150.00",
             "Formato inválido",
@@ -227,11 +226,11 @@ public class Historial extends javax.swing.JFrame {
     }
 }
     private void volver() {
-    // Abre pantalla_bancaria pasando el usuario con el saldo actualizado
-    pantalla_bancaria pb = new pantalla_bancaria(usuarioActual);
-    pb.setVisible(true);
-    this.dispose(); // Cierra esta ventana
+    ventanaAnterior.actualizarSaldo(usuarioActual); // Refresca el saldo
+    ventanaAnterior.setVisible(true); // Muestra la ventana que ya existía
+    this.dispose();
 }
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
