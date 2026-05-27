@@ -56,26 +56,33 @@ public class UsuarioDAO {
      * Retorna 1 si es exitoso, 0 si ya existe, -1 si hay error.
      */
     public static int registrar(String username, String password) {
-        String sql = "INSERT INTO usuarios (username, password, saldo) VALUES (?, ?, 100.0)";
+    String sql = "INSERT INTO usuarios (username, password, saldo) VALUES (?, ?, 100.0)";
+
+    try (Connection conn = DataBaseManager.conectar();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        pstmt.setString(1, username);
+        pstmt.setString(2, password);
+        pstmt.executeUpdate();
         
-        try (Connection conn = DataBaseManager.conectar();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setString(1, username);
-            pstmt.setString(2, password);
-            pstmt.executeUpdate();
-            
-            return 1; // Éxito
-            
-        } catch (SQLException e) {
-            // Si el error es de "UNIQUE", el usuario ya existe [cite: 18, 19, 20, 21]
-            if (e.getMessage() != null && e.getMessage().contains("UNIQUE")) {
-                return 0; // Usuario ya existente
-            }
-            System.out.println("Error al registrar: " + e.getMessage());
-            return -1; // Otro error
+
+        //  Obtener el ID del usuario recién creado
+        ResultSet rs = pstmt.getGeneratedKeys();
+        if (rs.next()) {
+            int nuevoId = rs.getInt(1);
+            TarjetaDAO.crear(nuevoId); // <- crea la tarjeta automáticamente
         }
+
+        return 1;
+
+    } catch (SQLException e) {
+        if (e.getMessage() != null && e.getMessage().contains("UNIQUE")) {
+            return 0;
+        }
+        System.out.println("Error al registrar: " + e.getMessage());
+        return -1;
     }
+}
     // Busca un usuario por su nombre de usuario
 public static Usuario buscarPorUsername(String username) {
     String sql = "SELECT id, username, saldo FROM usuarios WHERE username = ?";

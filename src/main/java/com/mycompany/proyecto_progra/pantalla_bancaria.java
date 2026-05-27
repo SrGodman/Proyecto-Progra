@@ -49,7 +49,6 @@ public class pantalla_bancaria extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Bancho Chepito - Menú Principal");
-        setPreferredSize(new java.awt.Dimension(675, 500));
         setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(30, 58, 131));
@@ -78,6 +77,7 @@ public class pantalla_bancaria extends javax.swing.JFrame {
         jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setText("Tarjetas asociadas");
         jButton2.setToolTipText("");
+        jButton2.addActionListener(this::jButton2ActionPerformed);
         jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(35, 192, -1, -1));
 
         jButton4.setBackground(new java.awt.Color(255, 153, 153));
@@ -117,6 +117,14 @@ public class pantalla_bancaria extends javax.swing.JFrame {
     this.setVisible(false); // Oculta en lugar de dispose()
         
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+    Tarjetas tarjetas = new Tarjetas(usuarioActual, this);
+    tarjetas.setVisible(true);
+    this.setVisible(false);
+    
+    }//GEN-LAST:event_jButton2ActionPerformed
     public void actualizarSaldo(Usuario usuario) {
     this.usuarioActual = usuario;
     jLabel1.setText("Bienvenido, " + usuario.getUsername());

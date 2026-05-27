@@ -45,12 +45,23 @@ public class DataBaseManager {
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
         );
     """;
+    
+    String crearTarjetas = """
+    CREATE TABLE IF NOT EXISTS tarjetas (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        usuario_id  INTEGER NOT NULL UNIQUE,
+        numero      TEXT    NOT NULL UNIQUE,
+        saldo       REAL    NOT NULL DEFAULT 0,
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    );
+""";
 
     try (Connection conn = conectar();
          Statement stmt = conn.createStatement()) {
 
         stmt.execute(crearUsuarios);
         stmt.execute(crearTransferencias);
+        stmt.execute(crearTarjetas);
         System.out.println("Tablas listas.");
 
     } catch (SQLException e) {
@@ -87,6 +98,35 @@ private static void insertarUsuariosPorDefecto() {
         }
     } catch (SQLException e) {
         System.out.println("Error al insertar usuarios: " + e.getMessage());
+    }
+
+    // Crear tarjetas para usuarios por defecto si no tienen
+    String verificarTarjeta = "SELECT COUNT(*) FROM tarjetas WHERE usuario_id = ?";
+    String idQuery = "SELECT id FROM usuarios WHERE username = ?";
+    String[] defaultUsers = {"Erick", "Jefferson"};
+
+    try (Connection conn = conectar()) {
+        for (String username : defaultUsers) {
+
+            int userId = -1;
+            try (PreparedStatement ps = conn.prepareStatement(idQuery)) {
+                ps.setString(1, username);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) userId = rs.getInt("id");
+            }
+
+            if (userId == -1) continue;
+
+            try (PreparedStatement check = conn.prepareStatement(verificarTarjeta)) {
+                check.setInt(1, userId);
+                ResultSet rs = check.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) continue; // Ya tiene tarjeta
+            }
+
+            TarjetaDAO.crear(userId); // Crea la tarjeta
+        }
+    } catch (SQLException e) {
+        System.out.println("Error al crear tarjetas por defecto: " + e.getMessage());
     }
 }
 
