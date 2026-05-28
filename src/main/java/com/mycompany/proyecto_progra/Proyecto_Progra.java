@@ -14,7 +14,8 @@ public class Proyecto_Progra {
         DataBaseManager.inicializarDB();
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                new login().setVisible(true);
+                login LOGIN = new login();
+                LOGIN.setVisible(true);
             }
         });
     }

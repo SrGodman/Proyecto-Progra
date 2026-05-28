@@ -52,6 +52,7 @@ public class Historial extends javax.swing.JFrame {
         jTable1 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Banco Chepito - Historial de transacciones");
 
         jPanel1.setBackground(new java.awt.Color(30, 58, 131));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());

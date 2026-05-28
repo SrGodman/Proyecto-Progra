@@ -29,6 +29,7 @@ public class Tarjetas extends javax.swing.JFrame {
     cargarDatos();
     jButtonCargar.addActionListener(e -> cargarSaldo());
     jButtonVolver.addActionListener(e -> volver());
+    this.setLocationRelativeTo(null);
 }
 
     /**
@@ -49,30 +50,58 @@ public class Tarjetas extends javax.swing.JFrame {
         jButtonVolver = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Bancho Chepito - Tarjetas");
         setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(30, 58, 131));
         jPanel1.setPreferredSize(new java.awt.Dimension(900, 600));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabelTitulo.setText("Mis Tarjetas");
+        jLabelTitulo.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabelTitulo.setForeground(new java.awt.Color(255, 255, 255));
+        jLabelTitulo.setText("Mis tarjetas:");
         jPanel1.add(jLabelTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, -1, -1));
 
-        jLabelNumero.setText("Numero");
+        jLabelNumero.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabelNumero.setForeground(new java.awt.Color(255, 255, 255));
+        jLabelNumero.setText("Número de tarjeta:");
         jPanel1.add(jLabelNumero, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 70, -1, -1));
 
-        jLabelSaldo.setText("Saldo");
-        jPanel1.add(jLabelSaldo, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, -1, 20));
+        jLabelSaldo.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabelSaldo.setForeground(new java.awt.Color(255, 255, 255));
+        jLabelSaldo.setText("Saldo disponible:");
+        jPanel1.add(jLabelSaldo, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 115, -1, 20));
 
+        jTextCarga.setBackground(new java.awt.Color(255, 255, 255));
         jTextCarga.setColumns(12);
-        jTextCarga.setText("Monto a Cargar");
-        jPanel1.add(jTextCarga, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 140, -1, -1));
+        jTextCarga.setForeground(new java.awt.Color(148, 163, 184));
+        jTextCarga.setText("Monto a Cargar (Q)");
+        jTextCarga.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jTextCargaFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTextCargaFocusLost(evt);
+            }
+        });
+        jPanel1.add(jTextCarga, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, 200, 40));
 
-        jButtonCargar.setText("Cargar Saldo");
-        jPanel1.add(jButtonCargar, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 140, -1, -1));
+        jButtonCargar.setBackground(new java.awt.Color(16, 185, 129));
+        jButtonCargar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jButtonCargar.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonCargar.setText("CARGAR SALDO");
+        jButtonCargar.setBorderPainted(false);
+        jButtonCargar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButtonCargar.setFocusPainted(false);
+        jPanel1.add(jButtonCargar, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 160, -1, 35));
 
-        jButtonVolver.setText("Volver");
-        jPanel1.add(jButtonVolver, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 140, -1, -1));
+        jButtonVolver.setBackground(new java.awt.Color(71, 85, 105));
+        jButtonVolver.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jButtonVolver.setText("VOLVER");
+        jButtonVolver.setBorderPainted(false);
+        jButtonVolver.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButtonVolver.setFocusPainted(false);
+        jPanel1.add(jButtonVolver, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 160, -1, 35));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -91,7 +120,24 @@ public class Tarjetas extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-private void cargarDatos() {
+
+    private void jTextCargaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextCargaFocusGained
+        // TODO add your handling code here:
+        if (jTextCarga.getText().equals("Monto a Cargar (Q)")) {
+        jTextCarga.setText("");
+        jTextCarga.setForeground(new java.awt.Color(51, 65, 85)); // Cambia a color de texto oscuro real
+        }
+    }//GEN-LAST:event_jTextCargaFocusGained
+
+    private void jTextCargaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextCargaFocusLost
+        if (jTextCarga.getText().isEmpty()) {
+        jTextCarga.setText("Monto a Cargar (Q)");
+        jTextCarga.setForeground(new java.awt.Color(148, 163, 184)); // Vuelve al color gris de pista
+        }
+    }//GEN-LAST:event_jTextCargaFocusLost
+
+        
+    private void cargarDatos() {
     tarjetaActual = TarjetaDAO.obtenerPorUsuario(usuarioActual.getId());
 
     if (tarjetaActual != null) {
