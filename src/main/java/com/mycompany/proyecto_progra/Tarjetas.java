@@ -93,29 +93,26 @@ public class Tarjetas extends javax.swing.JFrame {
         jButtonCargar.setBorderPainted(false);
         jButtonCargar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonCargar.setFocusPainted(false);
-        jPanel1.add(jButtonCargar, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 160, -1, 35));
+        jPanel1.add(jButtonCargar, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 160, 150, 40));
 
         jButtonVolver.setBackground(new java.awt.Color(71, 85, 105));
         jButtonVolver.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jButtonVolver.setForeground(new java.awt.Color(255, 255, 255));
         jButtonVolver.setText("VOLVER");
         jButtonVolver.setBorderPainted(false);
         jButtonVolver.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButtonVolver.setFocusPainted(false);
-        jPanel1.add(jButtonVolver, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 160, -1, 35));
+        jPanel1.add(jButtonVolver, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 290, 200, 35));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 666, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 384, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();

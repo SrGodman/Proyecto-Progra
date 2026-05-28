@@ -30,6 +30,8 @@ public class Historial extends javax.swing.JFrame {
     cargarHistorial();
     jButtonTranseferir.addActionListener(e -> transferir());
     jButtonVolver.addActionListener(e -> volver());
+            this.setLocationRelativeTo(null);
+
 }
     
     /**
@@ -63,36 +65,74 @@ public class Historial extends javax.swing.JFrame {
         jLabelUsuario.setToolTipText("");
         jPanel1.add(jLabelUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 6, -1, -1));
 
+        jTextDestino.setBackground(new java.awt.Color(255, 255, 255));
         jTextDestino.setColumns(15);
+        jTextDestino.setForeground(new java.awt.Color(148, 163, 184));
         jTextDestino.setText("Destino");
         jTextDestino.setToolTipText("");
         jTextDestino.setName("jTextDestino"); // NOI18N
+        jTextDestino.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jTextDestinoFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTextDestinoFocusLost(evt);
+            }
+        });
         jTextDestino.addActionListener(this::jTextDestinoActionPerformed);
-        jPanel1.add(jTextDestino, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 39, -1, -1));
+        jPanel1.add(jTextDestino, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, -1, 26));
         jTextDestino.getAccessibleContext().setAccessibleName("");
 
+        jTextMonto.setBackground(new java.awt.Color(255, 255, 255));
         jTextMonto.setColumns(15);
-        jTextMonto.setText("Monto");
+        jTextMonto.setForeground(new java.awt.Color(148, 163, 184));
+        jTextMonto.setText("Monto (Q)");
         jTextMonto.setName(""); // NOI18N
-        jPanel1.add(jTextMonto, new org.netbeans.lib.awtextra.AbsoluteConstraints(209, 39, -1, -1));
+        jTextMonto.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jTextMontoFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTextMontoFocusLost(evt);
+            }
+        });
+        jPanel1.add(jTextMonto, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 40, -1, 26));
 
+        jTextDescription.setBackground(new java.awt.Color(255, 255, 255));
         jTextDescription.setColumns(15);
+        jTextDescription.setForeground(new java.awt.Color(148, 163, 184));
         jTextDescription.setText("Descripción");
-        jPanel1.add(jTextDescription, new org.netbeans.lib.awtextra.AbsoluteConstraints(406, 37, -1, 26));
+        jTextDescription.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jTextDescriptionFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTextDescriptionFocusLost(evt);
+            }
+        });
+        jPanel1.add(jTextDescription, new org.netbeans.lib.awtextra.AbsoluteConstraints(405, 40, -1, 26));
 
         jButtonVolver.setBackground(new java.awt.Color(16, 185, 129));
-        jButtonVolver.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jButtonVolver.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButtonVolver.setForeground(new java.awt.Color(255, 255, 255));
-        jButtonVolver.setText("Volver");
+        jButtonVolver.setText("VOLVER");
+        jButtonVolver.setBorderPainted(false);
+        jButtonVolver.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButtonVolver.setFocusPainted(false);
         jButtonVolver.addActionListener(this::jButtonVolverActionPerformed);
-        jPanel1.add(jButtonVolver, new org.netbeans.lib.awtextra.AbsoluteConstraints(701, 38, -1, -1));
+        jPanel1.add(jButtonVolver, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 40, -1, 26));
 
         jButtonTranseferir.setBackground(new java.awt.Color(16, 185, 129));
-        jButtonTranseferir.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jButtonTranseferir.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButtonTranseferir.setForeground(new java.awt.Color(255, 255, 255));
-        jButtonTranseferir.setText("Transferir");
-        jPanel1.add(jButtonTranseferir, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 38, -1, -1));
+        jButtonTranseferir.setText("TRANSFERIR");
+        jButtonTranseferir.setBorderPainted(false);
+        jButtonTranseferir.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButtonTranseferir.setFocusPainted(false);
+        jPanel1.add(jButtonTranseferir, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 40, -1, 26));
 
+        jTable1.setBackground(new java.awt.Color(255, 255, 255));
+        jTable1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(148, 163, 184)));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -104,6 +144,7 @@ public class Historial extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        jTable1.setRowHeight(30);
         jScrollPane1.setViewportView(jTable1);
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 69, 780, 343));
@@ -131,6 +172,55 @@ public class Historial extends javax.swing.JFrame {
         volver();
     }//GEN-LAST:event_jButtonVolverActionPerformed
 
+    private void jTextDestinoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextDestinoFocusGained
+        // TODO add your handling code here:
+        if (jTextDestino.getText().equals("Destino")) {
+        jTextDestino.setText("");
+        jTextDestino.setForeground(new java.awt.Color(51, 65, 85)); // Cambia a color de texto oscuro real
+        }
+    }//GEN-LAST:event_jTextDestinoFocusGained
+
+    private void jTextDestinoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextDestinoFocusLost
+        // TODO add your handling code here:
+        if (jTextDestino.getText().isEmpty()) {
+        jTextDestino.setText("Destino");
+        jTextDestino.setForeground(new java.awt.Color(148, 163, 184)); // Vuelve al color gris de pista
+        }
+    }//GEN-LAST:event_jTextDestinoFocusLost
+
+    private void jTextMontoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextMontoFocusGained
+        // TODO add your handling code here:
+        if (jTextMonto.getText().equals("Monto (Q)")) {
+        jTextMonto.setText("");
+        jTextMonto.setForeground(new java.awt.Color(51, 65, 85)); // Cambia a color de texto oscuro real
+        }
+    }//GEN-LAST:event_jTextMontoFocusGained
+
+    private void jTextMontoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextMontoFocusLost
+        // TODO add your handling code here:
+        if (jTextMonto.getText().isEmpty()) {
+        jTextMonto.setText("Monto (Q)");
+        jTextMonto.setForeground(new java.awt.Color(148, 163, 184)); // Vuelve al color gris de pista
+        }
+    }//GEN-LAST:event_jTextMontoFocusLost
+
+    private void jTextDescriptionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextDescriptionFocusGained
+        // TODO add your handling code here:
+        if (jTextDescription.getText().equals("Descripción")) {
+        jTextDescription.setText("");
+        jTextDescription.setForeground(new java.awt.Color(51, 65, 85)); // Cambia a color de texto oscuro real
+        }
+    }//GEN-LAST:event_jTextDescriptionFocusGained
+
+    private void jTextDescriptionFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextDescriptionFocusLost
+        // TODO add your handling code here:
+        if (jTextDescription.getText().isEmpty()) {
+        jTextDescription.setText("Descripción");
+        jTextDescription.setForeground(new java.awt.Color(148, 163, 184)); // Vuelve al color gris de pista
+        }
+    }//GEN-LAST:event_jTextDescriptionFocusLost
+    
+    
     /**
      * @param args the command line arguments
      */
