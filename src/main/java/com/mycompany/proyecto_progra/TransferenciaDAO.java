@@ -12,18 +12,16 @@ import java.util.List;
 
 public class TransferenciaDAO {
 
-    public static boolean registrar(Usuario emisor, String destinoUsername,
-                                 double monto, String descripcion) {
+    public static boolean registrar(Usuario emisor, String destinoUsername, double monto, String descripcion) {
     Usuario destinatario = UsuarioDAO.buscarPorUsername(destinoUsername);
     if (destinatario == null) return false;
     if (emisor.getUsername().equalsIgnoreCase(destinoUsername)) return false;
 
-    String fecha = LocalDateTime.now()
-                   .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    String fecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-    String sqlTransferencia = """
-        INSERT INTO transferencias (usuario_id, origen, destino, monto, fecha, descripcion)
-        VALUES (?, ?, ?, ?, ?, ?)
+    String sqlTransferencia = """ 
+                              INSERT INTO transferencias (usuario_id, origen, destino, monto, fecha, descripcion)
+                              VALUES(?, ?, ?, ?, ?, ?)
     """;
 
     try (Connection conn = DataBaseManager.conectar()) {
@@ -66,7 +64,7 @@ public class TransferenciaDAO {
             pstmtSaldo.executeUpdate();
         }
 
-        conn.commit(); // ✅ Todo junto en una sola transacción
+        conn.commit(); // Todo junto en una sola transacción
 
         emisor.setSaldo(emisor.getSaldo() - monto); // Actualiza memoria
         return true;

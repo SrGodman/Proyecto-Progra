@@ -37,7 +37,6 @@ public class UsuarioDAO {
             ResultSet rs = pstmt.executeQuery();
             
             if (rs.next()) {
-                // AQUÍ ESTABA EL ERROR: Solo enviamos los 3 datos que pide tu clase Usuario
                 return new Usuario(
                     rs.getInt("id"),
                     rs.getString("username"),
@@ -52,7 +51,7 @@ public class UsuarioDAO {
     
 
     /**
-     * Método para registrar a un usuario con saldo de Q100 (Según el Diagrama)
+     * Método para registrar a un usuario con saldo de Q100
      * Retorna 1 si es exitoso, 0 si ya existe, -1 si hay error.
      */
     public static int registrar(String username, String password) {

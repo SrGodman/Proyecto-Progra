@@ -124,12 +124,12 @@ public class login extends javax.swing.JFrame {
 
     // 3. Evaluar resultado
     if (usuario != null) {
-        // ✅ Credenciales correctas: pasar el objeto Usuario completo
+        //  Credenciales correctas: pasar el objeto Usuario completo
         pantalla_bancaria pb = new pantalla_bancaria(usuario);
         pb.setVisible(true);
         this.dispose(); // Cerrar ventana de login
     } else {
-        // ❌ Credenciales incorrectas
+        //  Credenciales incorrectas
         Error err = new Error(this, true);
         err.setVisible(true);
     }

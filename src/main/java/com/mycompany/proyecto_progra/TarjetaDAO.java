@@ -33,8 +33,7 @@ public class TarjetaDAO {
     public static void crear(int usuarioId) {
         String numero = generarNumero();
         String sql = """
-            INSERT INTO tarjetas (usuario_id, numero, saldo)
-            VALUES (?, ?, 0.0)
+            INSERT INTO tarjetas (usuario_id, numero, saldo) VALUES (?, ?, 0.0)
         """;
 
         try (Connection conn = DataBaseManager.conectar();
@@ -99,7 +98,7 @@ public class TarjetaDAO {
                 pu.setInt(2, usuario.getId());
                 pu.executeUpdate();
 
-                conn.commit(); // ✅ Confirma ambos cambios
+                conn.commit(); // Confirma ambos cambios
 
                 // Actualiza en memoria
                 usuario.setSaldo(usuario.getSaldo() - monto);
