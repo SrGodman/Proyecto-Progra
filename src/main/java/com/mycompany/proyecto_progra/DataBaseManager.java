@@ -129,5 +129,4 @@ private static void insertarUsuariosPorDefecto() {
         System.out.println("Error al crear tarjetas por defecto: " + e.getMessage());
     }
 }
-
 }
